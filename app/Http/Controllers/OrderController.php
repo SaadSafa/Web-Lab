@@ -12,34 +12,31 @@ class OrderController extends Controller
 {
     public function index(Request $request)
     {
-        $status = $request->query('status');
+        $status = request('status');
+        $objOrder = new Order();
 
-        $orders = Order::query()
-            ->when($status, fn($q) => $q->where('status', $status))
-            ->latest()
-            ->paginate(10);
+        if ($status) {
+            $objOrder = Order::where('status', $status)->get();
+        } else {
+            $objOrder = Order::all();
+        }
 
-        return view('orders.index', compact('orders', 'status'));
+        return view('orders.index', ['record' => $objOrder, 'status' => $status]);
     }
 
     public function create()
     {
-        $menuItems = MenuItem::where('is_available', true)->orderBy('name')->get();
-        return view('orders.create', compact('menuItems'));
+        $objMenu = new MenuItem();
+        $objMenu = MenuItem::where('is_available', true)->get();
+        return view('orders.create', ['record' => $objMenu]);
     }
 
     public function store(Request $request)
     {
-        $data = $request->validate([
-            'customer_name' => ['nullable', 'string', 'max:255'],
-            'items' => ['required', 'array', 'min:1'],
-            'items.*.menu_item_id' => ['required', 'integer', 'exists:menu_items,id'],
-            'items.*.qty' => ['required', 'integer', 'min:1', 'max:20'],
-        ]);
-
-        // group by menu_item_id to avoid duplicates
+        $items = request('items');
+        
         $grouped = [];
-        foreach ($data['items'] as $row) {
+        foreach ($items as $row) {
             $id = (int) $row['menu_item_id'];
             $qty = (int) $row['qty'];
             $grouped[$id] = ($grouped[$id] ?? 0) + $qty;
@@ -50,17 +47,12 @@ class OrderController extends Controller
             ->get()
             ->keyBy('id');
 
-        if ($menuItems->count() !== count($grouped)) {
-            return back()->withErrors(['items' => 'One or more items are unavailable.'])->withInput();
-        }
-
         return DB::transaction(function () use ($request, $menuItems, $grouped) {
-
-            $order = Order::create([
-                'customer_name' => $request->input('customer_name'),
-                'status' => 'pending',
-                'total' => 0,
-            ]);
+            $objOrder = new Order();
+            $objOrder->customer_name = request('customer_name');
+            $objOrder->status = 'pending';
+            $objOrder->total = 0;
+            $objOrder->save();
 
             $total = 0;
 
@@ -70,35 +62,37 @@ class OrderController extends Controller
                 $line = $unit * $qty;
                 $total += $line;
 
-                OrderItem::create([
-                    'order_id' => $order->id,
-                    'menu_item_id' => $menuId,
-                    'qty' => $qty,
-                    'unit_price' => $unit,
-                    'line_total' => $line,
-                ]);
+                $objOrderItem = new OrderItem();
+                $objOrderItem->order_id = $objOrder->id;
+                $objOrderItem->menu_item_id = $menuId;
+                $objOrderItem->qty = $qty;
+                $objOrderItem->unit_price = $unit;
+                $objOrderItem->line_total = $line;
+                $objOrderItem->save();
             }
 
-            $order->update(['total' => $total]);
+            $objOrder->total = $total;
+            $objOrder->save();
 
-            return redirect()->route('orders.show', $order)->with('success', 'Order created!');
+            return redirect('/orders/' . $objOrder->id);
         });
     }
 
-    public function show(Order $order)
+    public function show($id)
     {
-        $order->load('items.menuItem');
-        return view('orders.show', compact('order'));
+        $objOrder = new Order();
+        $objOrder = Order::find($id);
+        $objOrder->load('items.menuItem');
+        return view('orders.show', ['rec' => $objOrder]);
     }
 
-    public function updateStatus(Request $request, Order $order)
+    public function updateStatus(Request $request, $id)
     {
-        $data = $request->validate([
-            'status' => ['required', 'in:pending,preparing,ready,picked_up,cancelled'],
-        ]);
+        $objOrder = new Order();
+        $objOrder = Order::find($id);
+        $objOrder->status = request('status');
+        $objOrder->save();
 
-        $order->update(['status' => $data['status']]);
-
-        return back()->with('success', 'Status updated.');
+        return redirect()->back();
     }
 }

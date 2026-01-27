@@ -26,11 +26,11 @@
         <h2 class="font-display text-xl text-sky-100">Now Preparing</h2>
         <p class="text-xs text-cream-muted">Orders in production</p>
       </div>
-      <span class="text-xs text-cream-muted">{{ $preparing->count() }} order(s)</span>
+      <span class="text-xs text-cream-muted">{{ $recordPrep->count() }} order(s)</span>
     </div>
 
     <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
-      @forelse($preparing as $o)
+      @forelse($recordPrep as $o)
         <div class="rounded-3xl border border-sky-400/25 bg-slate-950/30 p-5 text-center shadow-lg shadow-sky-400/10">
           <div class="text-cream-faint text-xs mb-1">ORDER</div>
           <div class="text-4xl font-black tracking-tight text-sky-100">#{{ $o->id }}</div>
@@ -47,11 +47,11 @@
         <h2 class="font-display text-xl text-emerald-100">Ready for Pickup</h2>
         <p class="text-xs text-cream-muted">Calling customers now</p>
       </div>
-      <span class="text-xs text-cream-muted">{{ $ready->count() }} order(s)</span>
+      <span class="text-xs text-cream-muted">{{ $recordReady->count() }} order(s)</span>
     </div>
 
     <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
-      @forelse($ready as $o)
+      @forelse($recordReady as $o)
         <div class="rounded-3xl border border-emerald-400/25 bg-slate-950/30 p-5 text-center shadow-lg shadow-emerald-400/10">
           <div class="text-cream-faint text-xs mb-1">READY</div>
           <div class="text-4xl font-black tracking-tight text-emerald-100">#{{ $o->id }}</div>

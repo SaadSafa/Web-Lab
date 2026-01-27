@@ -8,22 +8,22 @@
   </div>
 </div>
 
-<form method="POST" action="{{ route('menu-items.update', $menuItem) }}" class="glass-panel p-6 max-w-xl">
-  @csrf @method('PUT')
+<form method="POST" action="{{ route('menu-items.update', $rec->id) }}" class="glass-panel p-6 max-w-xl">
+  @csrf
   <div class="mb-5">
     <label class="field-label">Name</label>
-    <input name="name" value="{{ old('name', $menuItem->name) }}" class="input-base">
+    <input name="name" value="{{ old('name', $rec->name) }}" class="input-base">
     @error('name') <div class="text-rose-200 text-sm mt-2">{{ $message }}</div> @enderror
   </div>
 
   <div class="mb-5">
     <label class="field-label">Price</label>
-    <input name="price" type="number" step="0.01" value="{{ old('price', $menuItem->price) }}" class="input-base">
+    <input name="price" type="number" step="0.01" value="{{ old('price', $rec->price) }}" class="input-base">
     @error('price') <div class="text-rose-200 text-sm mt-2">{{ $message }}</div> @enderror
   </div>
 
   <label class="inline-flex items-center gap-3 text-cream-soft mb-6">
-    <input type="checkbox" name="is_available" {{ $menuItem->is_available ? 'checked' : '' }} class="h-4 w-4 rounded border-white/20 bg-slate-950/40 text-emerald-400 focus:ring-emerald-400/40">
+    <input type="checkbox" name="is_available" {{ $rec->is_available ? 'checked' : '' }} class="h-4 w-4 rounded border-white/20 bg-slate-950/40 text-emerald-400 focus:ring-emerald-400/40">
     Available
   </label>
 

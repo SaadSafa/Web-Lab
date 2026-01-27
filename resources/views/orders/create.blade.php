@@ -37,7 +37,7 @@
       <div class="row flex flex-wrap items-center gap-3">
         <div class="flex-1 min-w-[200px]">
           <select name="items[0][menu_item_id]" class="select-base">
-            @foreach($menuItems as $mi)
+            @foreach($record as $mi)
               <option value="{{ $mi->id }}">{{ $mi->name }} (${{ number_format($mi->price,2) }})</option>
             @endforeach
           </select>
@@ -70,7 +70,7 @@ function addRow(){
   div.innerHTML = `
     <div class="flex-1 min-w-[200px]">
       <select name="items[${i}][menu_item_id]" class="select-base">
-        @foreach($menuItems as $mi)
+        @foreach($record as $mi)
           <option value="{{ $mi->id }}">{{ $mi->name }} (${{ number_format($mi->price,2) }})</option>
         @endforeach
       </select>

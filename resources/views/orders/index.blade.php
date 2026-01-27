@@ -35,15 +35,15 @@
       </tr>
     </thead>
     <tbody class="divide-y divide-white/10">
-      @foreach($orders as $order)
+      @foreach($record as $rec)
       <tr class="hover:bg-white/5 transition">
-        <td class="px-5 py-3 font-medium">#{{ $order->id }}</td>
-        <td class="px-5 py-3">{{ $order->customer_name ?? 'Walk-in' }}</td>
-        <td class="px-5 py-3 capitalize text-cream-soft">{{ str_replace('_',' ',$order->status) }}</td>
-        <td class="px-5 py-3">${{ number_format($order->total, 2) }}</td>
-        <td class="px-5 py-3 text-cream-soft">{{ $order->created_at->format('Y-m-d H:i') }}</td>
+        <td class="px-5 py-3 font-medium">#{{ $rec->id }}</td>
+        <td class="px-5 py-3">{{ $rec->customer_name ?? 'Walk-in' }}</td>
+        <td class="px-5 py-3 capitalize text-cream-soft">{{ str_replace('_',' ',$rec->status) }}</td>
+        <td class="px-5 py-3">${{ number_format($rec->total, 2) }}</td>
+        <td class="px-5 py-3 text-cream-soft">{{ $rec->created_at->format('Y-m-d H:i') }}</td>
         <td class="px-5 py-3 text-right">
-          <a href="{{ route('orders.show', $order) }}" class="btn-ghost bg-white/10">
+          <a href="{{ route('orders.show', $rec->id) }}" class="btn-ghost bg-white/10">
             View
           </a>
         </td>
@@ -54,6 +54,5 @@
 </div>
 
 <div class="mt-6">
-  {{ $orders->links() }}
 </div>
 @endsection

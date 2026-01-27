@@ -9,8 +9,9 @@ class MenuItemController extends Controller
 {
     public function index()
     {
-        $items = MenuItem::latest()->paginate(10);
-        return view('menu-items.index', compact('items'));
+        $objItem = new MenuItem();
+        $objItem = MenuItem::all();
+        return view('menu-items.index', ['record' => $objItem]);
     }
 
     public function create()
@@ -20,42 +21,39 @@ class MenuItemController extends Controller
 
     public function store(Request $request)
     {
-        $data = $request->validate([
-            'name' => ['required','string','max:255'],
-            'price' => ['required','numeric','min:0'],
-            'is_available' => ['nullable'],
-        ]);
+        $objItem = new MenuItem();
+        $objItem->name = request('name');
+        $objItem->price = request('price');
+        $objItem->is_available = request('is_available') ? 1 : 0;
+        $objItem->save();
 
-        $data['is_available'] = $request->boolean('is_available');
-
-        MenuItem::create($data);
-
-        return redirect()->route('menu-items.index')->with('success', 'Menu item created.');
+        return redirect('/menu-items');
     }
 
-    public function edit(MenuItem $menuItem)
+    public function edit($id)
     {
-        return view('menu-items.edit', compact('menuItem'));
+        $objItem = new MenuItem();
+        $objItem = MenuItem::find($id);
+        return view('menu-items.edit', ['rec' => $objItem]);
     }
 
-    public function update(Request $request, MenuItem $menuItem)
+    public function update(Request $request, $id)
     {
-        $data = $request->validate([
-            'name' => ['required','string','max:255'],
-            'price' => ['required','numeric','min:0'],
-            'is_available' => ['nullable'],
-        ]);
+        $objItem = new MenuItem();
+        $objItem = MenuItem::find($id);
+        $objItem->name = request('name');
+        $objItem->price = request('price');
+        $objItem->is_available = request('is_available') ? 1 : 0;
+        $objItem->save();
 
-        $data['is_available'] = $request->boolean('is_available');
-
-        $menuItem->update($data);
-
-        return redirect()->route('menu-items.index')->with('success', 'Menu item updated.');
+        return redirect('/menu-items');
     }
 
-    public function destroy(MenuItem $menuItem)
+    public function destroy($id)
     {
-        $menuItem->delete();
-        return redirect()->route('menu-items.index')->with('success', 'Menu item deleted.');
+        $objItem = new MenuItem();
+        $objItem = MenuItem::find($id);
+        $objItem->delete();
+        return redirect('/menu-items');
     }
 }
