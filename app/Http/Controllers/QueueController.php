@@ -8,9 +8,15 @@ class QueueController extends Controller
 {
     public function index()
     {
-        $preparing = Order::where('status', 'preparing')->latest()->take(12)->get();
-        $ready = Order::where('status', 'ready')->latest()->take(12)->get();
+        $objPrep = new Order();
+        $objPrep = Order::where('status', 'preparing')->get();
+        
+        $objReady = new Order();
+        $objReady = Order::where('status', 'ready')->get();
 
-        return view('queue.index', compact('preparing', 'ready'));
+        return view('queue.index', [
+            'recordPrep' => $objPrep, 
+            'recordReady' => $objReady
+        ]);
     }
 }

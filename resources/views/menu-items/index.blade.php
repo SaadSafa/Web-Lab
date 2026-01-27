@@ -25,12 +25,12 @@
       </tr>
     </thead>
     <tbody class="divide-y divide-white/10">
-      @foreach($items as $item)
+      @foreach($record as $rec)
       <tr class="hover:bg-white/5 transition">
-        <td class="px-4 py-3 font-medium">{{ $item->name }}</td>
-        <td class="px-4 py-3 text-cream-100">${{ number_format($item->price,2) }}</td>
+        <td class="px-4 py-3 font-medium">{{ $rec->name }}</td>
+        <td class="px-4 py-3 text-cream-100">${{ number_format($rec->price,2) }}</td>
         <td class="px-4 py-3">
-          @if($item->is_available)
+          @if($rec->is_available)
             <span class="inline-flex items-center gap-2 rounded-full bg-emerald-500/15 px-3 py-1 text-emerald-200 border border-emerald-500/20">
               <span class="h-2 w-2 rounded-full bg-emerald-400"></span> Available
             </span>
@@ -42,12 +42,12 @@
         </td>
         <td class="px-4 py-3">
           <div class="flex justify-end gap-2">
-            <a href="{{ route('menu-items.edit',$item) }}" class="btn-ghost bg-white/10">
+            <a href="{{ route('menu-items.edit',$rec->id) }}" class="btn-ghost bg-white/10">
               Edit
             </a>
 
-            <form action="{{ route('menu-items.destroy',$item) }}" method="POST">
-              @csrf @method('DELETE')
+            <form action="{{ route('menu-items.destroy',$rec->id) }}" method="POST">
+              @csrf
               <button type="submit" onclick="return confirm('Delete this item?')"
                       class="btn-ghost border border-rose-500/20 text-rose-200 bg-rose-500/10 hover:bg-rose-500/20">
                 Delete
@@ -62,6 +62,5 @@
 </div>
 
 <div class="mt-6">
-  {{ $items->links() }}
 </div>
 @endsection
