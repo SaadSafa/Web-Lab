@@ -1,0 +1,22 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+
+class Order extends Model
+{
+    protected $fillable = ['customer_name', 'status', 'total'];
+
+
+    public function items()
+    {
+    return $this->hasMany(OrderItem::class);
+    }
+
+
+    public function scopeQueue($q)
+    {
+    return $q->whereIn('status', ['preparing', 'ready']);
+    }
+}
