@@ -9,7 +9,7 @@
 </div>
 
 <form method="POST" action="{{ route('menu-items.update', $menuItem) }}" class="glass-panel p-6 max-w-xl">
-  @csrf @method('PUT')
+  @csrf
   <div class="mb-5">
     <label class="field-label">Name</label>
     <input name="name" value="{{ old('name', $menuItem->name) }}" class="input-base">

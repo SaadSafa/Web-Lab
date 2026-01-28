@@ -6,7 +6,6 @@ use App\Models\MenuItem;
 use App\Models\Order;
 use App\Models\OrderItem;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 
 class OrderController extends Controller
 {
@@ -14,10 +13,11 @@ class OrderController extends Controller
     {
         $status = $request->query('status');
 
-        $orders = Order::query()
-            ->when($status, fn($q) => $q->where('status', $status))
-            ->latest()
-            ->paginate(10);
+        $query = Order::query();
+        if ($status) {
+            $query->where('status', $status);
+        }
+        $orders = $query->latest()->paginate(10);
 
         return view('orders.index', compact('orders', 'status'));
     }
@@ -42,7 +42,12 @@ class OrderController extends Controller
         foreach ($data['items'] as $row) {
             $id = (int) $row['menu_item_id'];
             $qty = (int) $row['qty'];
-            $grouped[$id] = ($grouped[$id] ?? 0) + $qty;
+
+            if (isset($grouped[$id])) {
+                $grouped[$id] += $qty;
+            } else {
+                $grouped[$id] = $qty;
+            }
         }
 
         $menuItems = MenuItem::whereIn('id', array_keys($grouped))
@@ -54,50 +59,53 @@ class OrderController extends Controller
             return back()->withErrors(['items' => 'One or more items are unavailable.'])->withInput();
         }
 
-        return DB::transaction(function () use ($request, $menuItems, $grouped) {
+        $order = Order::create([
+            'customer_name' => $request->input('customer_name'),
+            'status' => 'pending',
+            'total' => 0,
+        ]);
 
-            $order = Order::create([
-                'customer_name' => $request->input('customer_name'),
-                'status' => 'pending',
-                'total' => 0,
+        $total = 0;
+
+        foreach ($grouped as $menuId => $qty) {
+            $item = $menuItems[$menuId];
+            $unit = (float) $item->price;
+            $line = $unit * $qty;
+            $total += $line;
+
+            OrderItem::create([
+                'order_id' => $order->id,
+                'menu_item_id' => $menuId,
+                'qty' => $qty,
+                'unit_price' => $unit,
+                'line_total' => $line,
             ]);
+        }
 
-            $total = 0;
+        $order->update(['total' => $total]);
 
-            foreach ($grouped as $menuId => $qty) {
-                $item = $menuItems[$menuId];
-                $unit = (float) $item->price;
-                $line = $unit * $qty;
-                $total += $line;
-
-                OrderItem::create([
-                    'order_id' => $order->id,
-                    'menu_item_id' => $menuId,
-                    'qty' => $qty,
-                    'unit_price' => $unit,
-                    'line_total' => $line,
-                ]);
-            }
-
-            $order->update(['total' => $total]);
-
-            return redirect()->route('orders.show', $order)->with('success', 'Order created!');
-        });
+        return redirect()->route('orders.show', $order)->with('success', 'Order created!');
     }
 
-    public function show(Order $order)
+    public function show($id)
     {
+        $order = Order::findOrFail($id);
         $order->load('items.menuItem');
         return view('orders.show', compact('order'));
     }
 
-    public function updateStatus(Request $request, Order $order)
+    public function updateStatus(Request $request, $id)
     {
+        $order = Order::findOrFail($id);
         $data = $request->validate([
             'status' => ['required', 'in:pending,preparing,ready,picked_up,cancelled'],
         ]);
 
         $order->update(['status' => $data['status']]);
+
+        if ($request->expectsJson()) {
+            return response()->json(['ok' => true]);
+        }
 
         return back()->with('success', 'Status updated.');
     }

@@ -4,6 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>@yield('title', 'Cafe Queue')</title>
+  <meta name="csrf-token" content="{{ csrf_token() }}">
   <meta name="theme-color" content="#0b0b0d"
   @import url('https://fonts.googleapis.com/css2?family=Fraunces:wght@500;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap');
   @vite(['resources/js/app.js'])

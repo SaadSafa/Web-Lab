@@ -62,9 +62,8 @@
     <h2 class="font-display text-lg mb-1">Update Status</h2>
     <p class="text-cream-muted text-sm mb-4">This controls what appears on the queue screen.</p>
 
-    <form method="POST" action="{{ route('orders.status', $order) }}" class="space-y-3">
+    <form method="POST" action="{{ route('orders.status', $order) }}" class="space-y-3" data-order-status-form>
       @csrf
-      @method('PATCH')
 
       <select name="status"
               class="w-full rounded-2xl bg-slate-950/40 border border-white/10 px-4 py-3 outline-none focus:ring-2 focus:ring-teal-300/40">
@@ -80,7 +79,8 @@
       </button>
     </form>
 
-    <div class="mt-5 text-xs text-cream-faint">
+    <div class="mt-4 text-xs text-cream-faint" data-order-status-message></div>
+    <div class="mt-2 text-xs text-cream-faint">
       Tip: set to <span class="text-cream-100">READY</span> to show it in green on the queue.
     </div>
   </div>

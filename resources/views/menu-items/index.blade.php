@@ -47,7 +47,7 @@
             </a>
 
             <form action="{{ route('menu-items.destroy',$item) }}" method="POST">
-              @csrf @method('DELETE')
+              @csrf
               <button type="submit" onclick="return confirm('Delete this item?')"
                       class="btn-ghost border border-rose-500/20 text-rose-200 bg-rose-500/10 hover:bg-rose-500/20">
                 Delete

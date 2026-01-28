@@ -33,12 +33,13 @@ class MenuItemController extends Controller
         return redirect()->route('menu-items.index')->with('success', 'Menu item created.');
     }
 
-    public function edit(MenuItem $menuItem)
+    public function edit($id)
     {
+        $menuItem = MenuItem::findOrFail($id);
         return view('menu-items.edit', compact('menuItem'));
     }
 
-    public function update(Request $request, MenuItem $menuItem)
+    public function update(Request $request, $id)
     {
         $data = $request->validate([
             'name' => ['required','string','max:255'],
@@ -47,14 +48,17 @@ class MenuItemController extends Controller
         ]);
 
         $data['is_available'] = $request->boolean('is_available');
+        
+        $menuItem = MenuItem::findOrFail($id);
 
         $menuItem->update($data);
 
         return redirect()->route('menu-items.index')->with('success', 'Menu item updated.');
     }
 
-    public function destroy(MenuItem $menuItem)
+    public function destroy($id)
     {
+        $menuItem = MenuItem::findOrFail($id);
         $menuItem->delete();
         return redirect()->route('menu-items.index')->with('success', 'Menu item deleted.');
     }
